@@ -1,8 +1,15 @@
-# Install Flask from pip3
-# Flask version should be 2.1.0
+# Ensure Python3 and pip3 are installed
+package { 'python3':
+  ensure => installed,
+}
 
-package {'Flask':
+package { 'python3-pip':
+  ensure => installed,
+}
+
+# Install Flask using pip3 with the specified version
+package { 'Flask':
   ensure   => '2.1.0',
-  name     => 'Flask',
   provider => 'pip3',
+  require  => Package['python3', 'python3-pip'],
 }
