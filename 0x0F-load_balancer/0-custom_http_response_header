@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
-# Install and configure Nginx server (in remote server) to:
-# Be listening on port 80 (does by default?)
-# Return a page containing the string 'Hello World!' when queried at its root/ with a GET request using curl
+# Install and configure Nginx server to:
+# - Be listening on port 80
+# - Return a page containing the string 'Hello World!' when queried at its root
+# - Add a custom header X-Served-By with the server's hostname
 
-# Update apt-get (first time use) and Install Nginx
+# Update apt-get and install Nginx
 sudo apt-get -y update
 sudo apt-get -y install nginx
-# reconfigure firewall to allow access to the nginx service
+
+# Reconfigure firewall to allow access to the Nginx service
 sudo ufw allow 'Nginx HTTP'
 
-# configure (use defaults), just replace index.html's contents
+# Replace the contents of index.html
 echo "Hello World!" | sudo tee /var/www/html/index.html
-# add a custom header, X-Served-By: server/hostname
-sudo sed -i '49i\add_header X-Served-By "83517-web-02";' /etc/nginx/sites-available/default
-# once done, restart nginx to enable the changes
+
+# Dynamically add a custom header, X-Served-By, with the hostname
+sudo sed -i '/server_name _;/a \\n    location / {\n        try_files $uri $uri/ =404;\n        add_header X-Served-By $hostname;\n    }' /etc/nginx/sites-available/default
+
+# Restart Nginx to apply the changes
 sudo service nginx restart
